@@ -1,0 +1,41 @@
+# =========
+# == IDE ==
+# =========
+/.vs/
+/.idea/
+*.user
+
+# ===========
+# == Build ==
+# ===========
+/bin/
+/obj/
+*.csproj
+*.sln
+
+# ===========
+# == Unity ==
+# ===========
+/Library/
+/Temp/
+/[Bb]uild/
+/[Bb]uilds/
+
+# ==================
+# == Addressables ==
+# ==================
+/ServerData/
+/HostData/
+*/AddressableAssetsData/Android*
+
+
+# ================
+# == Exclusions ==
+# ================
+!*.obj
+!*.dll
+
+
+# ==================
+# == Miscelaneous ==
+# ==================
