@@ -10,14 +10,12 @@ namespace NeonBlaze.UI
 		public Button OptionsButton { get; private set; }
 		public Button ExitButton { get; private set; }
 
-		protected override IEnumerable<Object> Bind()
+		protected override void Bind()
 		{
 			var root = mPanelRenderer.visualTree;
 			StartButton = root.Q<Button>("start-button");
 			OptionsButton = root.Q<Button>("options-button");
 			ExitButton = root.Q<Button>("exit-button");
-			OnInitialized();
-			return null;
 		}
 
 		protected override void OnInitialized()

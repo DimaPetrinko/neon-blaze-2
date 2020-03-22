@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="fade-plane" style="background-color: rgb(0, 0, 0);&#10;flex-grow: 1;&#10;">
+        <Style src="FadeScreen.uss" />
+    </ui:VisualElement>
+</ui:UXML>
