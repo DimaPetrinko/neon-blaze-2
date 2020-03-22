@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="menu" class="root">
+        <Style src="MainMenu.uss" />
+        <ui:VisualElement style="justify-content: center;&#10;align-items: flex-start;&#10;padding-left: 30px;&#10;padding-right: 30px;&#10;padding-top: 30px;&#10;padding-bottom: 30px;&#10;position: absolute;&#10;right: 0;&#10;bottom: 0;&#10;">
+            <ui:Label text="Main menu" style="color: rgb(221, 221, 221);&#10;-unity-font-style: bold;&#10;font-size: 48px;&#10;padding-bottom: 0;&#10;padding-left: 0;&#10;padding-right: 0;&#10;margin-bottom: 20px;&#10;" />
+            <ui:Button text="Start" name="start-button" class="menu-button" />
+            <ui:Button text="Options" name="options-button" class="menu-button" />
+            <ui:Button text="Exit" name="exit-button" class="menu-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
