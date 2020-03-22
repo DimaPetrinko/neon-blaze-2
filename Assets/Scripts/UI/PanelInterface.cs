@@ -10,6 +10,8 @@ namespace NeonBlaze.UI
 	[RequireComponent(typeof(PanelRenderer))]
 	public abstract class PanelInterface : MonoBehaviour
 	{
+		public event Action Initialized;
+
 		[Range(byte.MinValue, byte.MaxValue)]
 		[SerializeField] private byte m_Order = 127;
 
@@ -36,13 +38,14 @@ namespace NeonBlaze.UI
 
 		protected abstract void Bind();
 
-		protected abstract void OnInitialized();
+		protected abstract void Bound();
 
 		private IEnumerable<Object> BindInternal()
 		{
 			mRoot = mPanelRenderer.visualTree;
 			Bind();
-			OnInitialized();
+			Bound();
+			Initialized?.Invoke();
 			return null;
 		}
 	}

@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -7,6 +6,11 @@ namespace NeonBlaze.UI
 {
 	public class FadePanelInterface : PanelInterface
 	{
+		public delegate void FadeDelegate(float target);
+
+		public event FadeDelegate FadeStarted;
+		public event FadeDelegate FadeFinished;
+
 		[SerializeField] private float m_FadeSpeed = 1f;
 
 		private VisualElement mFadePanel;
@@ -30,11 +34,9 @@ namespace NeonBlaze.UI
 		public void Fade(float target)
 		{
 			mTargetOpacity = target;
-			if (!mFading)
-			{
-				if (gameObject.activeInHierarchy) StartCoroutine(FadeCoroutine());
-				else ApplyOpacity(target);
-			}
+			if (mFading) return;
+			if (gameObject.activeInHierarchy) StartCoroutine(FadeCoroutine());
+			else ApplyOpacity(target);
 		}
 
 		protected override void OnDisable()
@@ -48,17 +50,18 @@ namespace NeonBlaze.UI
 			mFadePanel = mRoot.Q("fade-plane");
 		}
 
-		protected override void OnInitialized()
+		protected override void Bound()
 		{
 			ApplyOpacity(0f);
 		}
 
 		private IEnumerator FadeCoroutine()
 		{
-			mFading = true;
 			if (mPanelRenderer == null) yield break;
+			mFading = true;
+			FadeStarted?.Invoke(mTargetOpacity);
 			var currentOpacity = mFadePanel.style.opacity;
-			while (currentOpacity.value != mTargetOpacity)
+			while (!Mathf.Approximately(currentOpacity.value, mTargetOpacity))
 			{
 				if (mFadePanel != null)
 				{
@@ -73,6 +76,7 @@ namespace NeonBlaze.UI
 				yield return null;
 			}
 			mFading = false;
+			FadeFinished?.Invoke(mTargetOpacity);
 		}
 
 		private void ApplyOpacity(float opacity)
