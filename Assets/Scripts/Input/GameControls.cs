@@ -1,4 +1,4 @@
-// GENERATED AUTOMATICALLY FROM 'Assets/GameControls.inputactions'
+// GENERATED AUTOMATICALLY FROM 'Assets/InternalAssets/Input/GameControls.inputactions'
 
 using System;
 using System.Collections;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-namespace NeonBlaze
+namespace NeonBlaze.Input
 {
     public class @GameControls : IInputActionCollection, IDisposable
     {

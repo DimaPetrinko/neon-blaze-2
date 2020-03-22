@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace NeonBlaze
+namespace NeonBlaze.UI
 {
 	public class MenuPanelInterface : PanelInterface
 	{
@@ -16,13 +16,18 @@ namespace NeonBlaze
 			StartButton = root.Q<Button>("start-button");
 			OptionsButton = root.Q<Button>("options-button");
 			ExitButton = root.Q<Button>("exit-button");
+			OnInitialized();
+			return null;
+		}
+
+		protected override void OnInitialized()
+		{
 			if (StartButton != null) StartButton.clicked += () => Debug.Log("Start!");
 			else Debug.LogError($"{nameof(StartButton)} is null");
 			if (OptionsButton != null) OptionsButton.clicked += () => Debug.Log("Options");
 			else Debug.LogError($"{nameof(OptionsButton)} is null");
 			if (ExitButton != null) ExitButton.clicked += () => Debug.Log("Exiting");
 			else Debug.LogError($"{nameof(ExitButton)} is null");
-			return null;
 		}
 	}
 }
