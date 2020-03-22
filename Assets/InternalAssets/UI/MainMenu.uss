@@ -24,9 +24,10 @@ Button.menu-button {
     background-color: rgba(0, 0, 0, 0);
     border-width: 0;
     margin: 10px;
-    margin-left: 20px;
-    padding-right: 5px;
-    padding-left: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    white-space: no-wrap;
+    -unity-text-align: middle-left;
 }
 
 Button.menu-button:hover {
