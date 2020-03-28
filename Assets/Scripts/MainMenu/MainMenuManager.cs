@@ -1,35 +1,31 @@
-﻿using NeonBlaze.MainMenu.UI;
-using NeonBlaze.UI;
+﻿using NeonBlaze.Core;
+using NeonBlaze.MainMenu.UI;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace NeonBlaze.MainMenu
 {
 	public class MainMenuManager : MonoBehaviour
 	{
 		[SerializeField] private MainMenuPanelInterface m_MainMenuPanelInterface;
-		[SerializeField] private FadePanelInterface m_FadePanelInterface;
 
 		private void Start()
 		{
+			void OnUIInitialized()
+			{
+				m_MainMenuPanelInterface.Initialized -= OnUIInitialized;
+				m_MainMenuPanelInterface.StartButton.clicked += OnStartButtonClicked;
+				m_MainMenuPanelInterface.OptionsButton.clicked += OnOptionsButtonClicked;
+				m_MainMenuPanelInterface.ExitButton.clicked += OnExitButtonClicked;
+			}
+
 			if (m_MainMenuPanelInterface.IsInitialized) OnUIInitialized();
 			else m_MainMenuPanelInterface.Initialized += OnUIInitialized;
 		}
 
-		private void OnUIInitialized()
-		{
-			m_MainMenuPanelInterface.Initialized -= OnUIInitialized;
-			m_MainMenuPanelInterface.StartButton.clicked += OnStartButtonClicked;
-			m_MainMenuPanelInterface.OptionsButton.clicked += OnOptionsButtonClicked;
-			m_MainMenuPanelInterface.ExitButton.clicked += OnExitButtonClicked;
-		}
-
 		private void OnStartButtonClicked()
 		{
-			void StartAction() => SceneManager.LoadSceneAsync("Game");
-
-			m_FadePanelInterface.FadeIn(StartAction);
+			App.Instance.TransitionToScene("MainMenu", "Game");
 		}
 
 		private void OnOptionsButtonClicked() => Debug.Log("Options");
@@ -45,11 +41,12 @@ namespace NeonBlaze.MainMenu
 				#endif
 			}
 
-			m_FadePanelInterface.FadeIn(ExitAction);
+			App.Instance.FadePanel.FadeIn(ExitAction);
 		}
 
 		private void OnDestroy()
 		{
+			if (m_MainMenuPanelInterface == null) return;
 			m_MainMenuPanelInterface.StartButton.clicked -= OnStartButtonClicked;
 			m_MainMenuPanelInterface.OptionsButton.clicked -= OnOptionsButtonClicked;
 			m_MainMenuPanelInterface.ExitButton.clicked -= OnExitButtonClicked;

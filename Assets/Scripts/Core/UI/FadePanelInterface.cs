@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace NeonBlaze.UI
+namespace NeonBlaze.Core.UI
 {
 	public class FadePanelInterface : PanelInterface
 	{
@@ -59,7 +59,7 @@ namespace NeonBlaze.UI
 			mTargetOpacity = target;
 			if (mFading) return;
 			if (gameObject.activeInHierarchy) StartCoroutine(FadeCoroutine());
-			else ApplyOpacity(target);
+			else FadeImmediately(target);
 		}
 
 		public void Fade(float target, Action callback)
@@ -74,6 +74,38 @@ namespace NeonBlaze.UI
 			Fade(target);
 		}
 
+		public void FadeImmediately(float target)
+		{
+			mTargetOpacity = target;
+			if (!mFading) StartFade();
+			ApplyOpacity(mTargetOpacity);
+			FinishFade();
+		}
+
+		public void FadeImmediately(float target, Action callback)
+		{
+			void OnFadeFinished(float t)
+			{
+				FadeFinished -= OnFadeFinished;
+				callback();
+			}
+
+			FadeFinished += OnFadeFinished;
+			FadeImmediately(target);
+		}
+
+		protected override void Awake()
+		{
+			base.Awake();
+			void OnInitialized()
+			{
+				Initialized -= OnInitialized;
+				FadeImmediately(0);
+			}
+
+			Initialized += OnInitialized;
+		}
+
 		protected override void OnDisable()
 		{
 			base.OnDisable();
@@ -85,26 +117,14 @@ namespace NeonBlaze.UI
 			mFadePanel = mRoot.Q("fade-plane");
 		}
 
-		protected override void Bound()
-		{
-			ApplyOpacity(0f);
-		}
-
 		private IEnumerator FadeCoroutine()
 		{
-			void FinishFade()
-			{
-				mFading = false;
-				FadeFinished?.Invoke(mTargetOpacity);
-			}
-
-			if (mPanelRenderer == null)
+			if (Renderer == null)
 			{
 				FinishFade();
 				yield break;
 			}
-			mFading = true;
-			FadeStarted?.Invoke(mTargetOpacity);
+			StartFade();
 			var currentOpacity = mFadePanel.style.opacity;
 			while (!Mathf.Approximately(currentOpacity.value, mTargetOpacity))
 			{
@@ -122,6 +142,18 @@ namespace NeonBlaze.UI
 				yield return null;
 			}
 			FinishFade();
+		}
+
+		private void StartFade()
+		{
+			mFading = true;
+			FadeStarted?.Invoke(mTargetOpacity);
+		}
+
+		private void FinishFade()
+		{
+			mFading = false;
+			FadeFinished?.Invoke(mTargetOpacity);
 		}
 
 		private void ApplyOpacity(float opacity)

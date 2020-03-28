@@ -1,5 +1,5 @@
-﻿using UnityEngine.UIElements;
-using NeonBlaze.UI;
+﻿using NeonBlaze.Core.UI;
+using UnityEngine.UIElements;
 
 namespace NeonBlaze.MainMenu.UI
 {
@@ -11,12 +11,17 @@ namespace NeonBlaze.MainMenu.UI
 
 		protected override void Bind()
 		{
-			var root = mPanelRenderer.visualTree;
-			StartButton = root.Q<Button>("start-button");
-			OptionsButton = root.Q<Button>("options-button");
-			ExitButton = root.Q<Button>("exit-button");
+			StartButton = mRoot.Q<Button>("start-button");
+			OptionsButton = mRoot.Q<Button>("options-button");
+			ExitButton = mRoot.Q<Button>("exit-button");
 		}
 
-		protected override void Bound() {}
+		protected override void OnDestroy()
+		{
+			base.OnDestroy();
+			StartButton = null;
+			OptionsButton = null;
+			ExitButton = null;
+		}
 	}
 }

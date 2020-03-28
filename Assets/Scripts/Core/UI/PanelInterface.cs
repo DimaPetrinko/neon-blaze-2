@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace NeonBlaze.UI
+namespace NeonBlaze.Core.UI
 {
 	[RequireComponent(typeof(PanelRenderer))]
 	public abstract class PanelInterface : MonoBehaviour
@@ -15,9 +15,17 @@ namespace NeonBlaze.UI
 		[Range(byte.MinValue, byte.MaxValue)]
 		[SerializeField] private byte m_Order = 127;
 
-		protected PanelRenderer mPanelRenderer;
+		private PanelRenderer mPanelRenderer;
 		protected VisualElement mRoot;
 
+		public PanelRenderer Renderer
+		{
+			get
+			{
+				if (mPanelRenderer == null) Awake();
+				return mPanelRenderer;
+			}
+		}
 		public bool IsInitialized { get; protected set; }
 		public byte Order => m_Order;
 
@@ -29,24 +37,26 @@ namespace NeonBlaze.UI
 
 		protected virtual void OnEnable()
 		{
-			mPanelRenderer.postUxmlReload = BindInternal;
-			if (mPanelRenderer.visualTree != null) mPanelRenderer.visualTree.visible = true;
+			Renderer.postUxmlReload = BindInternal;
+			if (Renderer.visualTree != null) Renderer.visualTree.visible = true;
 		}
 
 		protected virtual void OnDisable()
 		{
-			mPanelRenderer.visualTree.visible = false;
+			Renderer.visualTree.visible = false;
+		}
+
+		protected virtual void OnDestroy()
+		{
+			Initialized = null;
 		}
 
 		protected abstract void Bind();
 
-		protected abstract void Bound();
-
 		private IEnumerable<Object> BindInternal()
 		{
-			mRoot = mPanelRenderer.visualTree;
+			mRoot = Renderer.visualTree;
 			Bind();
-			Bound();
 			IsInitialized = true;
 			Initialized?.Invoke();
 			return null;
