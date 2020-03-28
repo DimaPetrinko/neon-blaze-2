@@ -18,11 +18,13 @@ namespace NeonBlaze.UI
 		protected PanelRenderer mPanelRenderer;
 		protected VisualElement mRoot;
 
+		public bool IsInitialized { get; protected set; }
 		public byte Order => m_Order;
 
 		protected virtual void Awake()
 		{
 			mPanelRenderer = GetComponent<PanelRenderer>();
+			IsInitialized = false;
 		}
 
 		protected virtual void OnEnable()
@@ -45,6 +47,7 @@ namespace NeonBlaze.UI
 			mRoot = mPanelRenderer.visualTree;
 			Bind();
 			Bound();
+			IsInitialized = true;
 			Initialized?.Invoke();
 			return null;
 		}

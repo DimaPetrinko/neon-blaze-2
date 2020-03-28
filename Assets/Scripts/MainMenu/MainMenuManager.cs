@@ -13,7 +13,8 @@ namespace NeonBlaze.MainMenu
 
 		private void Start()
 		{
-			m_MainMenuPanelInterface.Initialized += OnUIInitialized;
+			if (m_MainMenuPanelInterface.IsInitialized) OnUIInitialized();
+			else m_MainMenuPanelInterface.Initialized += OnUIInitialized;
 		}
 
 		private void OnUIInitialized()
@@ -26,23 +27,17 @@ namespace NeonBlaze.MainMenu
 
 		private void OnStartButtonClicked()
 		{
-			void OnFadeFinished(float target)
-			{
-				m_FadePanelInterface.FadeFinished -= OnFadeFinished;
-				SceneManager.LoadSceneAsync("Game");
-			}
+			void StartAction() => SceneManager.LoadSceneAsync("Game");
 
-			m_FadePanelInterface.FadeFinished += OnFadeFinished;
-			m_FadePanelInterface.FadeIn();
+			m_FadePanelInterface.FadeIn(StartAction);
 		}
 
 		private void OnOptionsButtonClicked() => Debug.Log("Options");
 
 		private void OnExitButtonClicked()
 		{
-			void OnFadeFinished(float target)
+			void ExitAction()
 			{
-				m_FadePanelInterface.FadeFinished -= OnFadeFinished;
 				#if UNITY_EDITOR
 				EditorApplication.ExitPlaymode();
 				#else
@@ -50,8 +45,7 @@ namespace NeonBlaze.MainMenu
 				#endif
 			}
 
-			m_FadePanelInterface.FadeFinished += OnFadeFinished;
-			m_FadePanelInterface.FadeIn();
+			m_FadePanelInterface.FadeIn(ExitAction);
 		}
 
 		private void OnDestroy()

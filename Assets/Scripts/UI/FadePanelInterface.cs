@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -17,11 +18,22 @@ namespace NeonBlaze.UI
 		private float mTargetOpacity;
 		private bool mFading;
 
-		#if UNITY_EDITOR
 		[ContextMenu("Fade in")]
 		public void FadeIn()
 		{
 			Fade(1f);
+		}
+
+		public void FadeIn(Action callback)
+		{
+			void OnFadeFinished(float t)
+			{
+				FadeFinished -= OnFadeFinished;
+				callback();
+			}
+
+			FadeFinished += OnFadeFinished;
+			FadeIn();
 		}
 
 		[ContextMenu("Fade out")]
@@ -29,7 +41,18 @@ namespace NeonBlaze.UI
 		{
 			Fade(0f);
 		}
-		#endif
+
+		public void FadeOut(Action callback)
+		{
+			void OnFadeFinished(float t)
+			{
+				FadeFinished -= OnFadeFinished;
+				callback();
+			}
+
+			FadeFinished += OnFadeFinished;
+			FadeOut();
+		}
 
 		public void Fade(float target)
 		{
@@ -37,6 +60,18 @@ namespace NeonBlaze.UI
 			if (mFading) return;
 			if (gameObject.activeInHierarchy) StartCoroutine(FadeCoroutine());
 			else ApplyOpacity(target);
+		}
+
+		public void Fade(float target, Action callback)
+		{
+			void OnFadeFinished(float t)
+			{
+				FadeFinished -= OnFadeFinished;
+				callback();
+			}
+
+			FadeFinished += OnFadeFinished;
+			Fade(target);
 		}
 
 		protected override void OnDisable()
