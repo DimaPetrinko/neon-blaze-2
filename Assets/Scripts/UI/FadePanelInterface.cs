@@ -92,7 +92,17 @@ namespace NeonBlaze.UI
 
 		private IEnumerator FadeCoroutine()
 		{
-			if (mPanelRenderer == null) yield break;
+			void FinishFade()
+			{
+				mFading = false;
+				FadeFinished?.Invoke(mTargetOpacity);
+			}
+
+			if (mPanelRenderer == null)
+			{
+				FinishFade();
+				yield break;
+			}
 			mFading = true;
 			FadeStarted?.Invoke(mTargetOpacity);
 			var currentOpacity = mFadePanel.style.opacity;
@@ -100,18 +110,18 @@ namespace NeonBlaze.UI
 			{
 				if (mFadePanel != null)
 				{
-					var direction = currentOpacity.value < mTargetOpacity ? 1 : -1;
+					var wasBelowTarget = currentOpacity.value < mTargetOpacity;
+					var direction = wasBelowTarget ? 1 : -1;
 					currentOpacity.value += direction * m_FadeSpeed;
-					if (direction > 0 && currentOpacity.value > mTargetOpacity
-						|| direction < 0 && currentOpacity.value < mTargetOpacity)
-						currentOpacity.value = mTargetOpacity;
+					currentOpacity.value = wasBelowTarget
+						? Mathf.Min(currentOpacity.value, mTargetOpacity)
+						: Mathf.Max(currentOpacity.value, mTargetOpacity);
 					ApplyOpacityUnsafe(currentOpacity);
 				}
 
 				yield return null;
 			}
-			mFading = false;
-			FadeFinished?.Invoke(mTargetOpacity);
+			FinishFade();
 		}
 
 		private void ApplyOpacity(float opacity)
