@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using NeonBlaze.Core.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -37,32 +36,14 @@ namespace NeonBlaze.Core
 				return;
 			}
 
-			var queue = new Queue<Action>();
+			var sequence  = new Sequence<Action>();
+			if (fromPresent && FadePanel != null) sequence.Add(() => FadePanel.FadeIn(() => sequence.Next()));
+			if (fromPresent) sequence.Add(() => StartCoroutine(TrackAsyncOperation(UnloadScene(fromScene), () => sequence.Next())));
+			sequence.Add(() => StartCoroutine(TrackAsyncOperation(LoadScene(toScene), () => sequence.Next())));
+			if (FadePanel != null) sequence.Add(() => FadePanel.FadeOut(() => sequence.Next()));
 
-			void NextAction()
-			{
-				if (queue.Count > 0) queue.Dequeue()?.Invoke();
-				else FinishSequence();
-			}
-
-			void FinishSequence()
-			{
-				queue.Clear();
-				callback?.Invoke();
-			}
-
-			if (fromPresent && FadePanel != null) queue.Enqueue(() => FadePanel.FadeIn(NextAction));
-			if (fromPresent) queue.Enqueue(() => StartCoroutine(TrackAsyncOperation(UnloadScene(fromScene), NextAction)));
-			queue.Enqueue(() => StartCoroutine(TrackAsyncOperation(LoadScene(toScene), NextAction)));
-			if (FadePanel != null) queue.Enqueue(() => FadePanel.FadeOut(NextAction));
-
-			NextAction();
-
-			// fade
-			// unload
-			// wait
-			// load
-			// fade
+			sequence.Finished += callback;
+			sequence.Start();
 		}
 
 		private IEnumerator TrackAsyncOperation(AsyncOperation op, Action callback)
@@ -73,10 +54,6 @@ namespace NeonBlaze.Core
 				yield return null;
 			}
 			callback?.Invoke();
-
-			// while not done
-			// skip frame
-			// then callback
 		}
 
 		private void Awake()
