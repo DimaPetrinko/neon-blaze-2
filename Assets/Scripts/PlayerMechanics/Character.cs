@@ -4,7 +4,7 @@ using UnityEngine;
 namespace NeonBlaze.PlayerMechanics
 {
 	[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
-	public class Character : MonoBehaviour
+	public sealed class Character : MonoBehaviour
 	{
 		public float Health
 		{
@@ -47,7 +47,11 @@ namespace NeonBlaze.PlayerMechanics
 			mRigidbody = GetComponent<Rigidbody2D>();
 			mCollider = GetComponent<Collider2D>();
 			mInput = GetComponent<ICharacterInput>();
-			if (mInput == null) Debug.LogError("No character input script was found on this gameObject");
+			if (mInput == null)
+			{
+				Debug.LogError("No character input script was found on this gameObject");
+				enabled = false;
+			}
 		}
 
 		private void Start()
@@ -56,7 +60,8 @@ namespace NeonBlaze.PlayerMechanics
 			Health = m_MaxHealth;
 			Stamina = m_MaxStamina;
 
-			m_Renderer.material.color = Color.white;
+			var color = m_Renderer.material.color;
+			m_Renderer.material.color = color; // just to create a material instance
 		}
 
 		private void Update()
@@ -104,9 +109,9 @@ namespace NeonBlaze.PlayerMechanics
 			mCollider.enabled = false;
 
 			var originalColor = m_Renderer.material.color;
-			var color = Color.white;
-			color.a = 0.5f;
-			m_Renderer.material.color = color;
+			var newColor = originalColor;
+			newColor.a *= 0.5f;
+			m_Renderer.material.color = newColor;
 
 			var originalSpeed = mCurrentSpeed;
 			mCurrentSpeed = m_DashSpeed;
