@@ -92,7 +92,7 @@ namespace NeonBlaze.PlayerMechanics
 				Attack();
 			}
 
-			if (mInput.HeavyAttack)
+			if (mInput.HeavyAttackHeld)
 			{
 				Debug.Log("Charging secondary attack");
 			}

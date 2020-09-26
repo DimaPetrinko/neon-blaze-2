@@ -7,7 +7,8 @@ namespace NeonBlaze.PlayerMechanics
 		public Vector2 MovementDirection { get; private set; }
 		public bool Dash { get; private set; }
 		public bool LightAttack { get; private set; }
-		public bool HeavyAttack { get; private set; }
+		public bool HeavyAttackHeld { get; private set; }
+		public bool HeavyAttackReleased { get; private set; }
 
 		public void ManualUpdate()
 		{
