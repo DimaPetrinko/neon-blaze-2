@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace NeonBlaze.PlayerMechanics
 {
-	public sealed class CharacterHUD : MonoBehaviour
+	public sealed class CharacterHUD : BaseUIPanel
 	{
 		[SerializeField] private Character m_Character;
 		[SerializeField] private Image m_HealthBar;
