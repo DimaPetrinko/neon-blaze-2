@@ -9,8 +9,13 @@ namespace NeonBlaze.PlayerMechanics
 		public float Health
 		{
 			get => mHealth;
-			set => mHealth = Mathf.Clamp(value, 0, m_MaxHealth);
+			set
+			{
+				mHealth = Mathf.Clamp(value, 0, m_MaxHealth);
+				if (mHealth <= 0) Die();
+			}
 		}
+
 		public float NormalizedHealth => Health / m_MaxHealth;
 
 		public float Stamina
@@ -20,22 +25,25 @@ namespace NeonBlaze.PlayerMechanics
 		}
 		public float NormalizedStamina => Stamina / m_MaxStamina;
 
+		[Header("Appearance")]
 		[SerializeField] private SpriteRenderer m_Renderer;
-		[SerializeField] private float m_Speed = 1f;
+		[Header("Stats")]
 		[SerializeField] private float m_MaxHealth = 100;
 		[SerializeField] private float m_MaxStamina = 100;
 		[SerializeField] private float m_StaminaRegenerationSpeed = 10;
+		[SerializeField] private float m_LightAttackDamage = 20;
+		[SerializeField] private float m_Speed = 1;
+		[Header("Dash")]
 		[SerializeField] private float m_DashStaminaCost = 20;
-		[SerializeField] private float m_DashSpeed = 1f;
+		[SerializeField] private float m_DashSpeed = 1;
 		[SerializeField] private float m_DashDuration;
-		[SerializeField] private float m_DashCooldown = 1f;
+		[SerializeField] private float m_DashCooldown = 1;
 
 		private Rigidbody2D mRigidbody;
 		private Collider2D mCollider;
 		private ICharacterInput mInput;
 
 		private Vector2 mDashDirection;
-		private float mCurrentSpeed;
 		private bool mDashCoolDownActive;
 		private bool mDashActive;
 
@@ -56,7 +64,6 @@ namespace NeonBlaze.PlayerMechanics
 
 		private void Start()
 		{
-			mCurrentSpeed = m_Speed;
 			Health = m_MaxHealth;
 			Stamina = m_MaxStamina;
 
@@ -69,7 +76,7 @@ namespace NeonBlaze.PlayerMechanics
 			mInput.ManualUpdate();
 
 			var movementDirection = !mDashActive
-				? mInput.MovementDirection * mCurrentSpeed
+				? mInput.MovementDirection * m_Speed
 				: mDashDirection;
 
 			if (!mDashCoolDownActive
@@ -82,7 +89,7 @@ namespace NeonBlaze.PlayerMechanics
 
 			if (mInput.LightAttack)
 			{
-				Debug.Log("FIRE!");
+				Attack();
 			}
 
 			if (mInput.HeavyAttack)
@@ -100,6 +107,30 @@ namespace NeonBlaze.PlayerMechanics
 			Destroy(m_Renderer.material);
 		}
 
+		private void Attack()
+		{
+			// cast circle in front
+			// if something is in it
+			// and it's a character
+			// retract health from it
+
+			var hits = new RaycastHit2D[4];
+			var hitsCount = Physics2D.CircleCastNonAlloc(transform.position,
+				((CircleCollider2D)mCollider).radius * 2f, Vector2.zero, hits);
+
+			if (hitsCount <= 0) return;
+
+			for (var i = 0; i < hitsCount; i++)
+			{
+				if (hits[i].transform == transform) continue;
+
+				var character = hits[i].transform.GetComponent<Character>();
+				if (character == null) continue;
+
+				character.Health -= m_LightAttackDamage;
+			}
+		}
+
 		private IEnumerator Dash()
 		{
 			mDashCoolDownActive = true;
@@ -113,14 +144,11 @@ namespace NeonBlaze.PlayerMechanics
 			newColor.a *= 0.5f;
 			m_Renderer.material.color = newColor;
 
-			var originalSpeed = mCurrentSpeed;
-			mCurrentSpeed = m_DashSpeed;
-			mDashDirection = mInput.MovementDirection * mCurrentSpeed;
+			mDashDirection = mInput.MovementDirection * m_DashSpeed;
 
 			m_DashDuration = Mathf.Max(Time.deltaTime, m_DashDuration);
 			yield return new WaitForSeconds(m_DashDuration);
 
-			mCurrentSpeed = originalSpeed;
 			m_Renderer.material.color = originalColor;
 			mCollider.enabled = true;
 
@@ -129,6 +157,12 @@ namespace NeonBlaze.PlayerMechanics
 			yield return new WaitForSeconds(m_DashCooldown - m_DashDuration);
 
 			mDashCoolDownActive = false;
+		}
+
+		private void Die()
+		{
+			Debug.Log($"{name} died!");
+			gameObject.SetActive(false);
 		}
 	}
 }
