@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 293643218}
   - component: {fileID: 293643219}
   m_Layer: 5
-  m_Name: PlayerUI
+  m_Name: HUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -173,7 +173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 774ea1d6e457483d830b229012d19e7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Player: {fileID: 992131244}
+  m_Character: {fileID: 992131244}
   m_HealthBar: {fileID: 418116454}
   m_StaminaBar: {fileID: 1926587639}
 --- !u!1 &418116452

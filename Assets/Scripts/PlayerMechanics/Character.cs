@@ -4,7 +4,7 @@ using UnityEngine;
 namespace NeonBlaze.PlayerMechanics
 {
 	[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
-	public class Player : MonoBehaviour
+	public class Character : MonoBehaviour
 	{
 		public float Health
 		{
