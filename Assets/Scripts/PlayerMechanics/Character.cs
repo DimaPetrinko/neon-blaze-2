@@ -109,11 +109,6 @@ namespace NeonBlaze.PlayerMechanics
 
 		private void Attack()
 		{
-			// cast circle in front
-			// if something is in it
-			// and it's a character
-			// retract health from it
-
 			var hits = new RaycastHit2D[4];
 			var hitsCount = Physics2D.CircleCastNonAlloc(transform.position,
 				((CircleCollider2D)mCollider).radius * 2f, Vector2.zero, hits);
