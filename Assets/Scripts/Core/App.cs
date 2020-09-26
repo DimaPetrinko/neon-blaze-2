@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using NeonBlaze.Core.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,11 +7,11 @@ namespace NeonBlaze.Core
 {
 	public class App : MonoBehaviour
 	{
-		[SerializeField] private FadePanelInterface m_FadePanel;
+		[SerializeField] private FadePanelView m_FadePanel;
 
 		public static App Instance { get; private set; }
 
-		public FadePanelInterface FadePanel => m_FadePanel;
+		public FadePanelView FadePanel => m_FadePanel;
 
 		public AsyncOperation LoadScene(string sceneName, bool additive = true)
 		{
@@ -64,16 +63,18 @@ namespace NeonBlaze.Core
 
 		private void Start()
 		{
-			void OnUIInitialized()
-			{
-				m_FadePanel.Initialized -= OnUIInitialized;
+			// void OnUIInitialized()
+			// {
+			// 	m_FadePanel.Initialized -= OnUIInitialized;
+			//
+			// 	FadePanel.FadeImmediately(1);
+			// 	TransitionToScene("", "MainMenu");
+			// }
+			//
+			// if (m_FadePanel.IsInitialized) OnUIInitialized();
+			// else m_FadePanel.Initialized += OnUIInitialized;
 
-				FadePanel.FadeImmediately(1);
-				TransitionToScene("", "MainMenu");
-			}
-
-			if (m_FadePanel.IsInitialized) OnUIInitialized();
-			else m_FadePanel.Initialized += OnUIInitialized;
+			TransitionToScene("", "MainMenu");
 		}
 	}
 }

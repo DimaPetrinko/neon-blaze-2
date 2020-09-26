@@ -1,5 +1,5 @@
-﻿using NeonBlaze.Core;
-using NeonBlaze.MainMenu.UI;
+﻿using System;
+using NeonBlaze.Core;
 using UnityEditor;
 using UnityEngine;
 
@@ -50,6 +50,20 @@ namespace NeonBlaze.MainMenu
 			m_MainMenuPanelInterface.StartButton.clicked -= OnStartButtonClicked;
 			m_MainMenuPanelInterface.OptionsButton.clicked -= OnOptionsButtonClicked;
 			m_MainMenuPanelInterface.ExitButton.clicked -= OnExitButtonClicked;
+		}
+	}
+
+	public class MainMenuPanelInterface
+	{
+		public event Action Initialized;
+		public MainMenuPanelInterface.Button StartButton { get; set; }
+		public MainMenuPanelInterface.Button OptionsButton { get; set; }
+		public MainMenuPanelInterface.Button ExitButton { get; set; }
+		public bool IsInitialized { get; set; }
+
+		public class Button
+		{
+			public event Action clicked;
 		}
 	}
 }
