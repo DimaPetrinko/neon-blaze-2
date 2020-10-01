@@ -30,7 +30,6 @@ namespace NeonBlaze.PlayerMechanics
 		[SerializeField] private float m_MaxHealth = 100;
 		[SerializeField] private float m_MaxStamina = 100;
 		[SerializeField] private float m_StaminaRegenerationSpeed = 10;
-		[SerializeField] private float m_LightAttackDamage = 20;
 		[SerializeField] [Range(0, 10)] private float m_Speed = 1;
 		[Header("Movement")]
 		[SerializeField] [Range(0, 1)] private float m_MovementSmoothness = 1f;
@@ -40,10 +39,7 @@ namespace NeonBlaze.PlayerMechanics
 		[SerializeField] [Range(0, 2)] private float m_DashDuration;
 		[SerializeField] [Range(0, 10)] private float m_DashCooldown = 1;
 		[Header("LightAttack")]
-		[SerializeField] private float m_AttackStaminaCost = 20;
-		[SerializeField] [Range(0, 10)] private float m_AttackWindUpDuration;
-		[SerializeField] [Range(0, 5)] private float m_AttackSwingDuration;
-		[SerializeField] [Range(0, 10)] private float m_AttackRecoveryDuration;
+		[SerializeField] private Weapon m_Weapon;
 
 		private Rigidbody2D mRigidbody;
 		private Collider2D mCollider;
@@ -88,12 +84,12 @@ namespace NeonBlaze.PlayerMechanics
 			mInput.ManualUpdate();
 
 			Vector2 movementDirection;
-			if (CurrentStateIsNormalOrDashCooldown()) movementDirection = mInput.MovementDirection * m_Speed;
-			else if (CurrentStateIs(CharacterState.Dash)) movementDirection = mDashDirection;
-			else if (CurrentStateIsAttack()) movementDirection = Vector2.zero;
+			if (mCurrentState.IsNormalOrDashCooldown()) movementDirection = mInput.MovementDirection * m_Speed;
+			else if (mCurrentState.Is(CharacterState.Dash)) movementDirection = mDashDirection;
+			else if (mCurrentState.IsAttack()) movementDirection = Vector2.zero;
 			else movementDirection = Vector2.zero;
 
-			if (CurrentStateIsNormal()
+			if (mCurrentState.IsNormal()
 				&& Stamina >= m_DashStaminaCost
 				&& mInput.Dash
 				&& movementDirection.sqrMagnitude > 0.001f * 0.001f)
@@ -101,12 +97,12 @@ namespace NeonBlaze.PlayerMechanics
 				StartCoroutine(Dash());
 			}
 
-			if (CurrentStateIsNormalOrDashCooldown() && mInput.LightAttack)
+			if (mCurrentState.IsNormalOrDashCooldown() && mInput.LightAttack)
 			{
 				StartCoroutine(AttackCoroutine());
 			}
 
-			if (CurrentStateIsNormalOrDashCooldown() && mInput.HeavyAttackHeld)
+			if (mCurrentState.IsNormalOrDashCooldown() && mInput.HeavyAttackHeld)
 			{
 				Debug.Log("Charging secondary attack");
 			}
@@ -117,7 +113,7 @@ namespace NeonBlaze.PlayerMechanics
 			mRigidbody.MovePosition(Vector2.Lerp(mRigidbody.position, mTargetPosition,
 				Time.smoothDeltaTime / m_MovementSmoothness));
 
-			if (CurrentStateIsNormalOrDashCooldown())
+			if (mCurrentState.IsNormalOrDashCooldown())
 			{
 				Stamina += m_StaminaRegenerationSpeed * Time.deltaTime;
 			}
@@ -126,62 +122,43 @@ namespace NeonBlaze.PlayerMechanics
 		private void OnDestroy()
 		{
 			Destroy(m_Renderer.material);
+			if (mCurrentState.Is(CharacterState.AttackHit)) m_Weapon.ObjectHit -= HandleLightAttackHit;
 		}
 
 		#endregion
-
-		private void Attack()
-		{
-			var hits = new RaycastHit2D[4];
-			var hitsCount = Physics2D.CircleCastNonAlloc(transform.position,
-				((CircleCollider2D)mCollider).radius * 2f, Vector2.zero, hits);
-
-			if (hitsCount <= 0) return;
-
-			for (var i = 0; i < hitsCount; i++)
-			{
-				if (hits[i].transform == transform) continue;
-
-				var character = hits[i].transform.GetComponent<Character>();
-				if (character == null) continue;
-
-				character.Health -= m_LightAttackDamage;
-			}
-		}
 
 		private IEnumerator AttackCoroutine()
 		{
 			mPreviousState = mCurrentState;
 			mCurrentState = CharacterState.AttackWindUp;
 
-			Stamina -= m_AttackStaminaCost;
+			Stamina -= m_Weapon.StaminaCost;
+			m_Weapon.Show();
+			m_Weapon.WindUp();
 
-			var originalColor = m_Renderer.material.color;
-			var newColor = Color.blue;
-			m_Renderer.material.color = newColor;
-
-			yield return new WaitForSeconds(m_AttackWindUpDuration);
+			yield return new WaitForSeconds(m_Weapon.WindUpDuration);
 
 			mCurrentState = CharacterState.AttackHit;
+			m_Weapon.ObjectHit += HandleLightAttackHit;
+			m_Weapon.Hit();
 
-			newColor = Color.green;
-			m_Renderer.material.color = newColor;
-
-			// cast
-			Attack();
-
-			yield return new WaitForSeconds(m_AttackSwingDuration);
+			yield return new WaitForSeconds(m_Weapon.HitDuration);
 
 			mCurrentState = CharacterState.AttackRecovery;
+			m_Weapon.ObjectHit -= HandleLightAttackHit;
+			m_Weapon.Recover();
 
-			newColor = Color.red;
-			m_Renderer.material.color = newColor;
+			yield return new WaitForSeconds(m_Weapon.RecoveryDuration);
 
-			// still can't move
-			yield return new WaitForSeconds(m_AttackRecoveryDuration);
-
-			m_Renderer.material.color = originalColor;
+			m_Weapon.Hide();
 			mCurrentState = mPreviousState;
+		}
+
+		private void HandleLightAttackHit(Character other)
+		{
+			if (other == this) return;
+
+			other.Health -= m_Weapon.Damage;
 		}
 
 		private IEnumerator Dash()
@@ -210,7 +187,7 @@ namespace NeonBlaze.PlayerMechanics
 
 			yield return new WaitForSeconds(m_DashCooldown - m_DashDuration);
 
-			if (CurrentStateIsAttack()) mPreviousState = truePreviousState;
+			if (mCurrentState.IsAttack()) mPreviousState = truePreviousState;
 			else mCurrentState = mPreviousState;
 		}
 
@@ -222,23 +199,7 @@ namespace NeonBlaze.PlayerMechanics
 
 		#region States shortcuts
 
-		private bool CurrentStateIs(CharacterState state)
-		{
-			return mCurrentState == state;
-		}
-		private bool CurrentStateIsNormal()
-		{
-			return mCurrentState == CharacterState.Normal;
-		}
-		private bool CurrentStateIsNormalOrDashCooldown()
-		{
-			return mCurrentState == CharacterState.Normal || mCurrentState == CharacterState.DashCooldown;
-		}
-		private bool CurrentStateIsAttack()
-		{
-			return mCurrentState == CharacterState.AttackWindUp || mCurrentState == CharacterState.AttackHit
-				|| mCurrentState == CharacterState.AttackRecovery;
-		}
+		
 
 		#endregion
 	}
