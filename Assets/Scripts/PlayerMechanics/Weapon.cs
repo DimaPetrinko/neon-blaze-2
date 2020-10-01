@@ -6,7 +6,7 @@ namespace NeonBlaze.PlayerMechanics
 	[RequireComponent(typeof(Collider2D))]
 	public sealed class Weapon : MonoBehaviour
 	{
-		public event Action<Character> ObjectHit;
+		public event Action<Stats> ObjectHit;
 
 		public float Damage => m_Damage;
 		public float StaminaCost => m_StaminaCost;
@@ -80,7 +80,7 @@ namespace NeonBlaze.PlayerMechanics
 
 		private void OnTriggerEnter2D(Collider2D other)
 		{
-			var character = other.GetComponent<Character>();
+			var character = other.GetComponent<Stats>();
 			if (character == null) return;
 
 			ObjectHit?.Invoke(character);
