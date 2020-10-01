@@ -196,11 +196,5 @@ namespace NeonBlaze.PlayerMechanics
 			Debug.Log($"{name} died!");
 			gameObject.SetActive(false);
 		}
-
-		#region States shortcuts
-
-		
-
-		#endregion
 	}
 }
