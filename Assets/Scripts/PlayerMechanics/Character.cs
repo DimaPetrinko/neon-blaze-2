@@ -13,14 +13,12 @@ namespace NeonBlaze.PlayerMechanics
 		[Header("Stats")]
 		[SerializeField] private Stats m_Stats;
 		[SerializeField] [Range(0, 10)] private float m_Speed = 1;
-		[Header("Movement")]
-		[SerializeField] [Range(0, 1)] private float m_MovementSmoothness = 1f;
 		[Header("Dash")]
 		[SerializeField] private float m_DashStaminaCost = 20;
 		[SerializeField] [Range(0, 50)]  private float m_DashSpeed = 1;
 		[SerializeField] [Range(0, 2)] private float m_DashDuration;
 		[SerializeField] [Range(0, 10)] private float m_DashCooldown = 1;
-		[Header("LightAttack")]
+		[Header("Attack")]
 		[SerializeField] private Weapon m_Weapon;
 
 		private Rigidbody2D mRigidbody;
@@ -84,11 +82,7 @@ namespace NeonBlaze.PlayerMechanics
 				Debug.Log("Charging secondary attack");
 			}
 
-			mTargetPosition += movementDirection * Time.smoothDeltaTime;
-
-			m_MovementSmoothness = Mathf.Max(0.001f, m_MovementSmoothness);
-			mRigidbody.MovePosition(Vector2.Lerp(mRigidbody.position, mTargetPosition,
-				Time.smoothDeltaTime / m_MovementSmoothness));
+			mRigidbody.MovePosition(mRigidbody.position + movementDirection * Time.smoothDeltaTime);
 
 			m_Stats.ManualUpdate(mCurrentState.IsNormalOrDashCooldown());
 		}
