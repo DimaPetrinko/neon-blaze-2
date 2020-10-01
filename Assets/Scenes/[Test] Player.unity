@@ -178,7 +178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_RemoveLayouts: 1
-  m_Character: {fileID: 992131244}
+  m_Stats: {fileID: 992131250}
   m_HealthBar: {fileID: 418116454}
   m_StaminaBar: {fileID: 1926587639}
 --- !u!114 &293643220
@@ -393,6 +393,7 @@ GameObject:
   - component: {fileID: 371626602}
   - component: {fileID: 371626601}
   - component: {fileID: 371626600}
+  - component: {fileID: 371626605}
   - component: {fileID: 371626599}
   m_Layer: 8
   m_Name: Enemy
@@ -426,13 +427,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Renderer: {fileID: 371626603}
-  m_MaxHealth: 100
-  m_MaxStamina: 100
-  m_StaminaRegenerationSpeed: 20
+  m_Stats: {fileID: 371626605}
   m_Speed: 5
-  m_MovementSmoothness: 0.01
   m_DashStaminaCost: 20
-  m_DashSpeed: 10
+  m_DashSpeed: 25
   m_DashDuration: 0.08
   m_DashCooldown: 0.5
   m_Weapon: {fileID: 0}
@@ -539,6 +537,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &371626605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 371626598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15f30d3e92b846efaf97ce39b9adb255, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MaxHealth: 100
+  m_MaxStamina: 100
+  m_StaminaRegenerationSpeed: 20
 --- !u!1 &418116452
 GameObject:
   m_ObjectHideFlags: 0
@@ -672,7 +685,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_RemoveLayouts: 1
-  m_Character: {fileID: 371626600}
+  m_Stats: {fileID: 371626605}
   m_HealthBar: {fileID: 546394923}
   m_StaminaBar: {fileID: 686708601}
 --- !u!114 &493318193
@@ -1128,6 +1141,7 @@ GameObject:
   - component: {fileID: 992131245}
   - component: {fileID: 992131248}
   - component: {fileID: 992131244}
+  - component: {fileID: 992131250}
   - component: {fileID: 992131249}
   m_Layer: 8
   m_Name: Player
@@ -1149,13 +1163,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Renderer: {fileID: 992131246}
-  m_MaxHealth: 100
-  m_MaxStamina: 100
-  m_StaminaRegenerationSpeed: 20
-  m_Speed: 2
-  m_MovementSmoothness: 0.01
+  m_Stats: {fileID: 992131250}
+  m_Speed: 5
   m_DashStaminaCost: 20
-  m_DashSpeed: 10
+  m_DashSpeed: 25
   m_DashDuration: 0.08
   m_DashCooldown: 0.5
   m_Weapon: {fileID: 331897197}
@@ -1274,6 +1285,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6bc761c689a4055ad0c9991007f7e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &992131250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 992131243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15f30d3e92b846efaf97ce39b9adb255, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MaxHealth: 100
+  m_MaxStamina: 100
+  m_StaminaRegenerationSpeed: 20
 --- !u!1 &1177254529
 GameObject:
   m_ObjectHideFlags: 0
@@ -1832,5 +1858,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Target: {fileID: 992131247}
   m_CameraOffset: {x: 0, y: 0, z: -10}
-  m_AheadMultiplier: 105
+  m_AheadMultiplier: 200
   m_FollowSmoothness: 0.5
