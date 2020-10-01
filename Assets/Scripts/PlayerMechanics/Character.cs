@@ -31,17 +31,19 @@ namespace NeonBlaze.PlayerMechanics
 		[SerializeField] private float m_MaxStamina = 100;
 		[SerializeField] private float m_StaminaRegenerationSpeed = 10;
 		[SerializeField] private float m_LightAttackDamage = 20;
-		[SerializeField] private float m_Speed = 1;
+		[SerializeField] [Range(0, 10)] private float m_Speed = 1;
+		[Header("Movement")]
+		[SerializeField] [Range(0, 1)] private float m_MovementSmoothness = 1f;
 		[Header("Dash")]
 		[SerializeField] private float m_DashStaminaCost = 20;
-		[SerializeField] private float m_DashSpeed = 1;
-		[SerializeField] private float m_DashDuration;
-		[SerializeField] private float m_DashCooldown = 1;
+		[SerializeField] [Range(0, 50)]  private float m_DashSpeed = 1;
+		[SerializeField] [Range(0, 2)] private float m_DashDuration;
+		[SerializeField] [Range(0, 10)] private float m_DashCooldown = 1;
 		[Header("LightAttack")]
 		[SerializeField] private float m_AttackStaminaCost = 20;
-		[SerializeField] private float m_AttackWindUpDuration;
-		[SerializeField] private float m_AttackSwingDuration;
-		[SerializeField] private float m_AttackRecoveryDuration;
+		[SerializeField] [Range(0, 10)] private float m_AttackWindUpDuration;
+		[SerializeField] [Range(0, 5)] private float m_AttackSwingDuration;
+		[SerializeField] [Range(0, 10)] private float m_AttackRecoveryDuration;
 
 		private Rigidbody2D mRigidbody;
 		private Collider2D mCollider;
@@ -50,6 +52,7 @@ namespace NeonBlaze.PlayerMechanics
 		private CharacterState mCurrentState;
 		private CharacterState mPreviousState;
 
+		private Vector2 mTargetPosition;
 		private Vector2 mDashDirection;
 
 		private float mHealth;
@@ -77,6 +80,7 @@ namespace NeonBlaze.PlayerMechanics
 			var color = m_Renderer.material.color;
 			m_Renderer.material.color = color; // just to create a material instance
 			mCurrentState = CharacterState.Normal;
+			mTargetPosition = mRigidbody.position;
 		}
 
 		private void Update()
@@ -107,7 +111,11 @@ namespace NeonBlaze.PlayerMechanics
 				Debug.Log("Charging secondary attack");
 			}
 
-			mRigidbody.MovePosition(mRigidbody.position + movementDirection * Time.smoothDeltaTime);
+			mTargetPosition += movementDirection * Time.smoothDeltaTime;
+
+			m_MovementSmoothness = Mathf.Max(0.001f, m_MovementSmoothness);
+			mRigidbody.MovePosition(Vector2.Lerp(mRigidbody.position, mTargetPosition,
+				Time.smoothDeltaTime / m_MovementSmoothness));
 
 			if (CurrentStateIsNormalOrDashCooldown())
 			{

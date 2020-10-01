@@ -308,16 +308,17 @@ MonoBehaviour:
   m_MaxHealth: 100
   m_MaxStamina: 100
   m_StaminaRegenerationSpeed: 20
-  m_LightAttackDamage: 0
+  m_LightAttackDamage: 20
   m_Speed: 5
+  m_MovementSmoothness: 0.01
   m_DashStaminaCost: 20
-  m_DashSpeed: 25
-  m_DashDuration: 0.1
+  m_DashSpeed: 10
+  m_DashDuration: 0.08
   m_DashCooldown: 0.5
   m_AttackStaminaCost: 20
-  m_AttackWindUpDuration: 0
-  m_AttackSwingDuration: 0
-  m_AttackRecoveryDuration: 0
+  m_AttackWindUpDuration: 0.5
+  m_AttackSwingDuration: 0.1
+  m_AttackRecoveryDuration: 0.3
 --- !u!58 &371626601
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -1035,9 +1036,10 @@ MonoBehaviour:
   m_MaxStamina: 100
   m_StaminaRegenerationSpeed: 20
   m_LightAttackDamage: 20
-  m_Speed: 5
+  m_Speed: 2
+  m_MovementSmoothness: 0.01
   m_DashStaminaCost: 20
-  m_DashSpeed: 20
+  m_DashSpeed: 10
   m_DashDuration: 0.08
   m_DashCooldown: 0.5
   m_AttackStaminaCost: 20
@@ -1716,5 +1718,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Target: {fileID: 992131247}
   m_CameraOffset: {x: 0, y: 0, z: -10}
-  m_AheadMultiplier: 225
-  m_FollowSmoothness: 1
+  m_AheadMultiplier: 105
+  m_FollowSmoothness: 0.5
