@@ -1,7 +1,6 @@
-using System;
 using UnityEngine;
 
-namespace NeonBlaze.PlayerMechanics
+namespace NeonBlaze
 {
 	[RequireComponent(typeof(Camera))]
 	public sealed class CameraController : MonoBehaviour

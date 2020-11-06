@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using NeonBlaze.PlayerMechanics.Input;
 using UnityEngine;
 
 namespace NeonBlaze.PlayerMechanics

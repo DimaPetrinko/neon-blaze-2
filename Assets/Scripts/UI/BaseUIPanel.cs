@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace NeonBlaze.PlayerMechanics
+namespace NeonBlaze.UI
 {
 	public abstract class BaseUIPanel : MonoBehaviour
 	{

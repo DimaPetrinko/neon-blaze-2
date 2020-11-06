@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace NeonBlaze.PlayerMechanics
+namespace NeonBlaze.PlayerMechanics.Input
 {
 	public sealed class EnemyCharacterInput : MonoBehaviour, ICharacterInput
 	{

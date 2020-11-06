@@ -1,7 +1,8 @@
+using NeonBlaze.PlayerMechanics;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace NeonBlaze.PlayerMechanics
+namespace NeonBlaze.UI
 {
 	public sealed class StatsHUD : BaseUIPanel
 	{

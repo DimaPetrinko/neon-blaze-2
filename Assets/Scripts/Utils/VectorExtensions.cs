@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace NeonBlaze.PlayerMechanics
+namespace NeonBlaze.Utils
 {
 	public static class VectorExtensions
 	{
