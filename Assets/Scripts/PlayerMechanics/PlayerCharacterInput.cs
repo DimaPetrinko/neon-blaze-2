@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace NeonBlaze.PlayerMechanics
@@ -10,13 +11,37 @@ namespace NeonBlaze.PlayerMechanics
 		public bool HeavyAttackHeld { get; private set; }
 		public bool HeavyAttackReleased { get; private set; }
 
+		private readonly Queue<InputActionType> mActionQueue = new Queue<InputActionType>();
+
 		public void ManualUpdate()
 		{
-			MovementDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
-			Dash = Input.GetButtonDown("Dash");
-			LightAttack = Input.GetButtonDown("LightAttack");
+			MovementDirection = InputUtilities.NormalizeInput(
+				Input.GetAxisRaw("Horizontal"),
+				Input.GetAxisRaw("Vertical"));
+
+			if (Input.GetButtonDown("Dash")) mActionQueue.Enqueue(InputActionType.Dash);
+			if (Input.GetButtonDown("LightAttack")) mActionQueue.Enqueue(InputActionType.LightAttack);
 			HeavyAttackHeld = Input.GetButton("HeavyAttack");
-			HeavyAttackReleased = Input.GetButtonUp("HeavyAttack");
+			if (Input.GetButtonUp("HeavyAttack")) mActionQueue.Enqueue(InputActionType.HeavyAttack);
 		}
+
+		public InputActionType GetNextAction(out bool value)
+		{
+			if (mActionQueue.Count > 0)
+			{
+				value = true;
+				return mActionQueue.Dequeue();
+			}
+			else
+			{
+				value = false;
+				return InputActionType.None;
+			}
+		}
+	}
+
+	public enum InputActionType
+	{
+		None, Dash, LightAttack, HeavyAttack
 	}
 }

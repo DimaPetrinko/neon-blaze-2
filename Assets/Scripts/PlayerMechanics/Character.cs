@@ -28,8 +28,12 @@ namespace NeonBlaze.PlayerMechanics
 		private CharacterState mCurrentState;
 		private CharacterState mPreviousState;
 
-		private Vector2 mTargetPosition;
-		private Vector2 mDashDirection;
+		private Vector2 mOverridingDirection;
+
+		public Stats Stats => m_Stats;
+		public Vector2 MovementDirection => mInput.MovementDirection;
+		public bool MovementOverrideEnabled { get; set; }
+
 
 		#region Unity events
 
@@ -50,8 +54,7 @@ namespace NeonBlaze.PlayerMechanics
 			var color = m_Renderer.material.color;
 			m_Renderer.material.color = color; // just to create a material instance
 			mCurrentState = CharacterState.Normal;
-			mTargetPosition = mRigidbody.position;
-			m_Stats.HealthDepleted += Die;
+			Stats.HealthDepleted += Die;
 		}
 
 		private void Update()
@@ -60,12 +63,12 @@ namespace NeonBlaze.PlayerMechanics
 
 			Vector2 movementDirection;
 			if (mCurrentState.IsNormalOrDashCooldown()) movementDirection = mInput.MovementDirection * m_Speed;
-			else if (mCurrentState.Is(CharacterState.Dash)) movementDirection = mDashDirection;
+			else if (mCurrentState.Is(CharacterState.Dash)) movementDirection = mOverridingDirection;
 			else if (mCurrentState.IsAttack()) movementDirection = Vector2.zero;
 			else movementDirection = Vector2.zero;
 
 			if (mCurrentState.IsNormal()
-				&& m_Stats.Stamina >= m_DashStaminaCost
+				&& Stats.Stamina >= m_DashStaminaCost
 				&& mInput.Dash
 				&& movementDirection.sqrMagnitude > 0.001f * 0.001f)
 			{
@@ -84,24 +87,30 @@ namespace NeonBlaze.PlayerMechanics
 
 			mRigidbody.MovePosition(mRigidbody.position + movementDirection * Time.smoothDeltaTime);
 
-			m_Stats.ManualUpdate(mCurrentState.IsNormalOrDashCooldown());
+			Stats.ManualUpdate(mCurrentState.IsNormalOrDashCooldown());
 		}
 
 		private void OnDestroy()
 		{
 			Destroy(m_Renderer.material);
 			if (mCurrentState.Is(CharacterState.AttackHit)) m_Weapon.ObjectHit -= HandleLightAttackHit;
-			m_Stats.HealthDepleted -= Die;
+			Stats.HealthDepleted -= Die;
 		}
 
 		#endregion
+
+		public void OverrideMovementDirection(Vector2 direction)
+		{
+			mOverridingDirection = direction;
+			MovementOverrideEnabled = true;
+		}
 
 		private IEnumerator AttackCoroutine()
 		{
 			mPreviousState = mCurrentState;
 			mCurrentState = CharacterState.AttackWindUp;
 
-			m_Stats.Stamina -= m_Weapon.StaminaCost;
+			Stats.Stamina -= m_Weapon.StaminaCost;
 			m_Weapon.Show();
 			m_Weapon.WindUp();
 
@@ -125,7 +134,7 @@ namespace NeonBlaze.PlayerMechanics
 
 		private void HandleLightAttackHit(Stats other)
 		{
-			if (other == m_Stats) return;
+			if (other == Stats) return;
 
 			other.Health -= m_Weapon.Damage;
 		}
@@ -136,7 +145,7 @@ namespace NeonBlaze.PlayerMechanics
 			var truePreviousState = mPreviousState;
 			mCurrentState = CharacterState.Dash;
 
-			m_Stats.Stamina -= m_DashStaminaCost;
+			Stats.Stamina -= m_DashStaminaCost;
 			mCollider.enabled = false;
 
 			var originalColor = m_Renderer.material.color;
@@ -144,7 +153,7 @@ namespace NeonBlaze.PlayerMechanics
 			newColor.a *= 0.5f;
 			m_Renderer.material.color = newColor;
 
-			mDashDirection = mInput.MovementDirection * m_DashSpeed;
+			mOverridingDirection = mInput.MovementDirection * m_DashSpeed;
 
 			m_DashDuration = Mathf.Max(Time.deltaTime, m_DashDuration);
 			yield return new WaitForSeconds(m_DashDuration);

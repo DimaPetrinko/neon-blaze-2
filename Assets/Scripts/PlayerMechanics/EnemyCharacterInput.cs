@@ -17,5 +17,7 @@ namespace NeonBlaze.PlayerMechanics
 			// LightAttack = Input.GetButtonDown("LightAttack");
 			// HeavyAttack = Input.GetButton("HeavyAttack");
 		}
+
+		public InputActionType GetNextAction(out bool value) => throw new System.NotImplementedException();
 	}
 }

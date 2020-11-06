@@ -34,7 +34,7 @@ namespace NeonBlaze.PlayerMechanics
 			var position = transform.position;
 			var velocity = m_Target.position - mPreviousPosition;
 
-			var followOffset = velocity * m_AheadMultiplier;
+			var followOffset = velocity * m_AheadMultiplier * Time.smoothDeltaTime;
 			var targetPosition = Target.position + m_CameraOffset + followOffset;
 			position = Vector3.Lerp(position, targetPosition,
 				1 / m_FollowSmoothness * Time.smoothDeltaTime);
