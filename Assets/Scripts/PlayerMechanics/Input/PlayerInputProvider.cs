@@ -6,6 +6,8 @@ namespace NeonBlaze.PlayerMechanics.Input
 	{
 		public abstract Priority Priority { get; }
 		public abstract Vector2 LookDirection { get; }
+		public abstract bool LookDirectionChanged { get; protected set; }
+
 
 		public Vector2 MovementDirection => InputUtilities.NormalizeInput(
 			UnityEngine.Input.GetAxisRaw("Horizontal"),

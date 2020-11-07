@@ -6,6 +6,7 @@ namespace NeonBlaze.PlayerMechanics.Input
 	public sealed class CharacterInput : MonoBehaviour
 	{
 		private IInputProvider[] mProviders;
+		private IInputProvider mLastProvider;
 
 		public Vector2 MovementDirection { get; private set; }
 		public Vector2 LookDirection { get; private set; }
@@ -30,9 +31,14 @@ namespace NeonBlaze.PlayerMechanics.Input
 				MovementDirection = mProviders
 					.Select(p => p.MovementDirection)
 					.FirstOrDefault(d => d != Vector2.zero);
-				LookDirection = mProviders
-					.Select(p => p.LookDirection)
-					.FirstOrDefault(d => d != Vector2.zero);
+
+				var provider = mProviders.FirstOrDefault(p => p.LookDirection != Vector2.zero
+					&& p.LookDirectionChanged);
+				if (provider == null) provider = mLastProvider;
+				else mLastProvider = provider;
+
+				LookDirection = provider?.LookDirection ?? Vector2.right;
+
 				Dash = mProviders.Any(p => p.Dash);
 				LightAttack = mProviders.Any(p => p.LightAttack);
 				HeavyAttackHeld = mProviders.Any(p => p.HeavyAttackHeld);
@@ -61,6 +67,7 @@ namespace NeonBlaze.PlayerMechanics.Input
 		private void OnDestroy()
 		{
 			mProviders = null;
+			mLastProvider = null;
 		}
 	}
 

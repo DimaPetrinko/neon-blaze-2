@@ -11,6 +11,8 @@ namespace NeonBlaze.PlayerMechanics.Input
 		bool LightAttack { get; }
 		bool HeavyAttackHeld { get; }
 		bool HeavyAttackReleased { get; }
+
+		bool LookDirectionChanged { get; }
 	}
 
 	public enum Priority
@@ -29,5 +31,7 @@ namespace NeonBlaze.PlayerMechanics.Input
 		public bool LightAttack => false;
 		public bool HeavyAttackHeld => false;
 		public bool HeavyAttackReleased => false;
+
+		public bool LookDirectionChanged => false;
 	}
 }

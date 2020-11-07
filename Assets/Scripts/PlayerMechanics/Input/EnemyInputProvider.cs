@@ -12,5 +12,6 @@ namespace NeonBlaze.PlayerMechanics.Input
 		public bool LightAttack { get; private set; }
 		public bool HeavyAttackHeld { get; private set; }
 		public bool HeavyAttackReleased { get; private set; }
+		public bool LookDirectionChanged { get; private set; }
 	}
 }
