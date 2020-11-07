@@ -4,13 +4,15 @@ using UnityEngine;
 
 namespace NeonBlaze.PlayerMechanics
 {
-	[RequireComponent(typeof(Rigidbody2D),
-		typeof(Collider2D),
-		typeof(Stats))]
+	[RequireComponent(typeof(Rigidbody2D))]
+	[RequireComponent(typeof(Collider2D))]
+	[RequireComponent(typeof(Stats))]
+	[RequireComponent(typeof(CharacterInput))]
 	public sealed class Character : MonoBehaviour
 	{
 		[Header("Appearance")]
 		[SerializeField] private SpriteRenderer m_Renderer;
+		[SerializeField] private Transform m_Pivot;
 		[Header("Stats")]
 		[SerializeField] private Stats m_Stats;
 		[SerializeField] [Range(0, 10)] private float m_Speed = 1;
@@ -24,13 +26,15 @@ namespace NeonBlaze.PlayerMechanics
 
 		private Rigidbody2D mRigidbody;
 		private Collider2D mCollider;
-		private ICharacterInput mInput;
+		private CharacterInput mInput;
 
 		private CharacterState mCurrentState;
 		private CharacterState mPreviousState;
 
-		private Vector2 mTargetPosition;
 		private Vector2 mDashDirection;
+		private Vector2 mLastLookDirection;
+
+		public Vector2 Position => mRigidbody.position;
 
 		#region Unity events
 
@@ -38,7 +42,7 @@ namespace NeonBlaze.PlayerMechanics
 		{
 			mRigidbody = GetComponent<Rigidbody2D>();
 			mCollider = GetComponent<Collider2D>();
-			mInput = GetComponent<ICharacterInput>();
+			mInput = GetComponent<CharacterInput>();
 			if (mInput == null)
 			{
 				Debug.LogError("No character input script was found on this gameObject");
@@ -51,7 +55,6 @@ namespace NeonBlaze.PlayerMechanics
 			var color = m_Renderer.material.color;
 			m_Renderer.material.color = color; // just to create a material instance
 			mCurrentState = CharacterState.Normal;
-			mTargetPosition = mRigidbody.position;
 			m_Stats.HealthDepleted += Die;
 		}
 
@@ -64,6 +67,14 @@ namespace NeonBlaze.PlayerMechanics
 			else if (mCurrentState.Is(CharacterState.Dash)) movementDirection = mDashDirection;
 			else if (mCurrentState.IsAttack()) movementDirection = Vector2.zero;
 			else movementDirection = Vector2.zero;
+
+			Vector2 lookDirection;
+			if (!mCurrentState.IsAttack())
+			{
+				lookDirection = mInput.LookDirection;
+				mLastLookDirection = lookDirection;
+			}
+			else lookDirection = mLastLookDirection;
 
 			if (mCurrentState.IsNormal()
 				&& m_Stats.Stamina >= m_DashStaminaCost
@@ -83,7 +94,8 @@ namespace NeonBlaze.PlayerMechanics
 				Debug.Log("Charging secondary attack");
 			}
 
-			mRigidbody.MovePosition(mRigidbody.position + movementDirection * Time.smoothDeltaTime);
+			mRigidbody.MovePosition(Position + movementDirection * Time.smoothDeltaTime);
+			m_Pivot.rotation = Quaternion.FromToRotation(Vector2.right, lookDirection);
 
 			m_Stats.ManualUpdate(mCurrentState.IsNormalOrDashCooldown());
 		}
@@ -93,6 +105,10 @@ namespace NeonBlaze.PlayerMechanics
 			Destroy(m_Renderer.material);
 			if (mCurrentState.Is(CharacterState.AttackHit)) m_Weapon.ObjectHit -= HandleLightAttackHit;
 			m_Stats.HealthDepleted -= Die;
+
+			mRigidbody = null;
+			mCollider = null;
+			mInput = null;
 		}
 
 		#endregion
